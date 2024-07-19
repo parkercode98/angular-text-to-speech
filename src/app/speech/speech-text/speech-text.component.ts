@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject, Subscription, fromEvent, map, merge, tap } from 'rxjs';
 import { SpeechService } from '../services/speech.service';
-import { VoiceService } from '../services/voice.service';
+import { ElevenLabsVoiceService, GoogleVoiceService } from '../services/voice.service';
 
 @Component({
   selector: 'app-speech-text',
@@ -10,7 +10,10 @@ import { VoiceService } from '../services/voice.service';
       <textarea name="text" [(ngModel)]="msg" (change)="textChanged$.next()"></textarea>
       <button id="stop" #stop>Stop!</button>
       <button id="speak" #speak>Speak</button>
-      <button class="primary" type="button" id="eleven" #eleven (click)="playTextToSpeech()">Eleven Labs TTS</button>
+      <button class="primary" type="button" id="eleven" #eleven (click)="playElevenTextToSpeech()">
+        Eleven Labs TTS
+      </button>
+      <button class="primary" type="button" id="google" #google (click)="playGoogleTextToSpeech()">Google TTS</button>
     </ng-container>
   `,
   styleUrl: './speech-text.component.scss',
@@ -27,12 +30,20 @@ export class SpeechTextComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
   msg = 'The quick brown fox jumps over the lazy dog';
 
-  constructor(private speechService: SpeechService, private elevenVoice: VoiceService) {}
+  constructor(
+    private speechService: SpeechService,
+    private elevenVoice: ElevenLabsVoiceService,
+    private googleVoice: GoogleVoiceService
+  ) {}
 
   /* ----------------- */
 
-  playTextToSpeech() {
+  playElevenTextToSpeech() {
     this.elevenVoice.playTextToSpeech(this.msg);
+  }
+
+  playGoogleTextToSpeech() {
+    this.googleVoice.playTextToSpeech(this.msg);
   }
 
   /* ----------------- */

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-speech-synthesis',
+  selector: 'app-text-to-speech',
   template: `
     <div class="voiceinator">
       <h1>TTS</h1>
@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       <app-speech-text></app-speech-text>
     </div>
   `,
-  styleUrl: './speech-synthesis.component.scss',
+  styleUrl: './text-to-speech.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SpeechSynthesisComponent {}
+export class TextToSpeechComponent {}

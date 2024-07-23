@@ -6,7 +6,12 @@ import { SpeechModule } from './speech';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, SpeechModule],
-  template: ` <app-speech-synthesis></app-speech-synthesis> `,
+  template: `
+    <div class="main-wrapper">
+      <app-text-to-speech></app-text-to-speech>
+      <app-speech-to-text></app-speech-to-text>
+    </div>
+  `,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {

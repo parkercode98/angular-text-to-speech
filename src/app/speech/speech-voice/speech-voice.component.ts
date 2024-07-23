@@ -1,19 +1,17 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subscription, fromEvent, map, merge, tap } from 'rxjs';
-import { PropertyName } from '../interfaces/speech.interface';
-import { SpeechService } from '../services/speech.service';
+import { Subscription, fromEvent, map, merge, tap } from 'rxjs';
+import { TextToSpeechService, TTSPropertyName } from '../services/speech.service';
 
 @Component({
   selector: 'app-speech-voice',
   template: `
     <ng-container>
-      <select name="voice" id="voices" #voices>
-        <option *ngFor="let voice of voices$ | async" [value]="voice.name">{{ voice.name }} ({{ voice.lang }})</option>
-      </select>
       <label for="rate">Rate:</label>
       <input name="rate" type="range" min="0" max="3" value="1" step="0.1" #rate />
       <label for="pitch">Pitch:</label>
       <input name="pitch" type="range" min="0" max="2" step="0.1" #pitch value="1" />
+      <label for="volume">Volume:</label>
+      <input name="volume" type="range" min="0" max="1" step="0.1" #volume value="1" />
     </ng-container>
   `,
   styleUrl: './speech-voice.component.scss',
@@ -26,32 +24,33 @@ export class SpeechVoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pitch', { static: true, read: ElementRef })
   pitch!: ElementRef<HTMLInputElement>;
 
-  @ViewChild('voices', { static: true, read: ElementRef })
-  voiceDropdown!: ElementRef<HTMLSelectElement>;
+  @ViewChild('volume', { static: true, read: ElementRef })
+  volume!: ElementRef<HTMLInputElement>;
 
-  voices$!: Observable<SpeechSynthesisVoice[]>;
   subscription = new Subscription();
 
-  constructor(private speechService: SpeechService) {}
+  constructor(private speechService: TextToSpeechService) {}
 
   ngOnInit(): void {
-    this.voices$ = fromEvent(speechSynthesis, 'voiceschanged').pipe(
-      map(() => speechSynthesis.getVoices().filter((voice) => voice.lang.includes('en'))),
-      tap((voices) => this.speechService.setVoices(voices))
-    );
-
-    this.subscription.add(
-      fromEvent(this.voiceDropdown.nativeElement, 'change')
-        .pipe(tap(() => this.speechService.updateVoice(this.voiceDropdown.nativeElement.value)))
-        .subscribe()
-    );
-
     this.subscription.add(
       merge(fromEvent(this.rate.nativeElement, 'change'), fromEvent(this.pitch.nativeElement, 'change'))
         .pipe(
           map((e) => e.target as HTMLInputElement),
-          map((e) => ({ name: e.name as PropertyName, value: e.value })),
+          map((e) => ({ name: e.name as TTSPropertyName, value: e.value })),
           tap((property) => this.speechService.updateSpeech(property))
+        )
+        .subscribe()
+    );
+
+    this.subscription.add(
+      fromEvent(this.volume.nativeElement, 'change')
+        .pipe(
+          map((e) => e.target as HTMLInputElement),
+          map((e) => e.value),
+          tap((volume) => {
+            localStorage.setItem('volume', volume ?? '1');
+            window.postMessage({ type: 'volumeChange', volume });
+          })
         )
         .subscribe()
     );

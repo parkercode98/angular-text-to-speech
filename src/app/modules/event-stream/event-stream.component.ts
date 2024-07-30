@@ -1,14 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { EventMqttService } from '@services/event.mqtt.service';
-import { SharedModule } from '@shared/shared.module';
 import { Subscription } from 'rxjs';
+/* -------------------------------------------------------------------------- */
 
 @Component({
   selector: 'event-stream',
-  standalone: true,
-  imports: [CommonModule, FormsModule, SharedModule],
   template: `
     <h5>Event Stream</h5>
     <div class="container">

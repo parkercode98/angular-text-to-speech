@@ -1,0 +1,17 @@
+:root {
+  // ----------------------------- Css Variables ---------------------------- //
+  --overlay-color: #fffd;
+  --backdrop-filter: blur(10px);
+
+  --discovery-background: #fff;
+  --discovery-background-90: #ffffffe6;
+  --discovery-background-80: #fffc;
+  --discovery-foreground: #000;
+  --discovery-foreground-90: #000000e6;
+  --discovery-foreground-80: #000c;
+  --discovery-cl-black: #424242;
+
+  // ------------------------------- Defaults ------------------------------- //
+  overscroll-behavior: none;
+  color: var(--discovery-foreground);
+}

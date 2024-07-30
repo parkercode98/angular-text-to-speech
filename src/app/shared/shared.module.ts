@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MaterialImportModule } from './lib';
 import { AiGlobComponent, MicButtonComponent } from './components';
+/* -------------------------------------------------------------------------- */
 
 @NgModule({
   declarations: [AiGlobComponent, MicButtonComponent],

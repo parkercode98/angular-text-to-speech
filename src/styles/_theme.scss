@@ -106,3 +106,16 @@ body.dark-theme,
   @include mat.core-color($dark-theme);
   @include mat.all-component-colors($dark-theme);
 }
+
+.dark-theme {
+  --discovery-background: #000;
+  --discovery-background-90: #000c;
+  --discovery-background-80: #020101cc;
+  --discovery-foreground: #fffc;
+  --discovery-foreground-90: #fffc;
+  --discovery-foreground-80: #fffc;
+  --discovery-cl-black: #fffc;
+  --overlay-color: #424242dd;
+
+  color: var(--discovery-foreground);
+}

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription, fromEvent, map, merge, tap } from 'rxjs';
-import { TextToSpeechService, TTSPropertyName } from '../services/speech.service';
+import { TextToSpeechService, TTSPropertyName } from '@services/speech.service';
 
 @Component({
   selector: 'app-speech-voice',

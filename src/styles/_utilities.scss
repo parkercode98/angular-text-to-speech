@@ -1,0 +1,20 @@
+/*
+Utilities
+*/
+$border-radius: 8px;
+$border-radius-top: 8px 8px 0 0;
+$border-radius-right: 0 8px 8px 0;
+$border-radius-left: 8px 0 0 8px;
+$border-radius-bottom: 0 0 8px 8px;
+$border-radius-bottom-right: 0 0 8px 0;
+
+/*
+Box Shadow
+*/
+$box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024,
+0 1px 5px 0 #0000001f;
+$box-shadow-2: 0 4px 4px #00000040;
+
+.no-box-shadow {
+  box-shadow: none !important;
+}

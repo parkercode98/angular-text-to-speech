@@ -1,65 +1,52 @@
+@use 'src/styles/_colors.scss' as *;
+
 :host {
-  display: block;
-}
-
-button,
-textarea {
-  width: 100%;
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
-  border: 0;
-  font-size: 2rem;
-  background: #f7f7f7;
-  outline: 0;
-}
-
-textarea {
-  height: 20rem;
-}
-
-button {
-  background: #ffc600;
-  border: 0;
-  width: 49%;
-  float: left;
-  font-family: 'Pacifico', cursive;
-  margin-bottom: 0;
-  font-size: 2rem;
-  border-bottom: 5px solid #f3c010;
-  cursor: pointer;
-  position: relative;
-}
-
-button:active {
-  top: 2px;
-}
-
-button:nth-of-type(1) {
-  margin-right: 2%;
-}
-
-.voiceinator {
-  padding: 2rem;
-  width: 50rem;
-  margin: 0 auto;
-  border-radius: 1rem;
+  display: flex;
+  flex-flow: column;
   position: relative;
   background: white;
+  border-radius: 1rem;
   overflow: hidden;
-  z-index: 1;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  width: calc(100% + 4rem);
-  margin: -2rem 0 2rem -2rem;
+textarea {
+  display: block;
+  margin: 10px 0;
   padding: 0.5rem;
-  background: #ffc600;
-  border-bottom: 5px solid #f3c010;
+  border: 1px solid #4b4b4b69;
+  border-radius: 0.5rem;
+  background: #f7f7f7;
+  outline: 0;
+  height: 10rem;
+}
+
+.container {
+  display: flex;
+  flex-flow: column;
+  padding: 2rem;
+  min-width: 500px;
+  z-index: 1;
+}
+
+h5 {
+  padding: 0.5rem;
+  background: $blue-accent;
   text-align: center;
-  font-size: 5rem;
-  font-weight: 100;
-  font-family: 'Pacifico', cursive;
-  text-shadow: 3px 3px 0 #f3c010;
+  color: white;
+}
+
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
+
+  button.recording {
+    background-color: $red;
+    mat-icon {
+      color: white;
+    }
+  }
 }

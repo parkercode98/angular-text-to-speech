@@ -1,19 +1,22 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SpeechModule } from './speech';
+import { AppModule } from './app.module';
+/* -------------------------------------------------------------------------- */
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SpeechModule],
+  imports: [AppModule],
   template: `
     <div class="main-wrapper">
-      <app-text-to-speech></app-text-to-speech>
-      <app-speech-to-text></app-speech-to-text>
+      <text-to-speech />
+      <speech-to-text />
+      <event-stream />
+      <!-- <ai-glob></ai-glob> -->
+      <!-- <mic-button></mic-button> -->
     </div>
   `,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'text-to-speech';
+  title = 'tts_stt';
 }

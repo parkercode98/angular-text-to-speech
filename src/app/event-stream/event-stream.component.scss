@@ -1,0 +1,49 @@
+@use 'src/styles/_colors.scss' as *;
+
+:host {
+  display: flex;
+  flex-flow: column;
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+textarea {
+  display: block;
+  margin: 10px 0;
+  padding: 0.5rem;
+  border: 1px solid #4b4b4b69;
+  border-radius: 0.5rem;
+  background: #f7f7f7;
+  outline: 0;
+  height: 10rem;
+}
+
+.container {
+  display: flex;
+  flex-flow: column;
+  padding: 2rem;
+  min-width: 500px;
+  z-index: 1;
+}
+
+h5 {
+  padding: 0.5rem;
+  background: $blue-accent;
+  text-align: center;
+  color: white;
+}
+
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
+
+  button.recording {
+    background-color: red;
+  }
+}

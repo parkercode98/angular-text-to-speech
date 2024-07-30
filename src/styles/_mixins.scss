@@ -1,0 +1,56 @@
+/*
+Widths
+*/
+$phone: 576px;
+$tablet: 768px;
+$desktop: 992px;
+$large: 1680px;
+
+/* Breakpoints */
+@mixin breakpoint($point) {
+  @if $point==intro {
+    /* 768px Wide - 670px High */
+    @media (min-width: 768px) and (min-height: 670px) {
+      @content;
+    }
+  } @else if $point==phone {
+    /* 576px Wide */
+    @media (min-width: $phone) {
+      @content;
+    }
+  } @else if $point==tablet {
+    /* 768px Wide */
+    @media (min-width: $tablet) {
+      @content;
+    }
+  } @else if $point==desktop {
+    /* 992px Wide */
+    @media (min-width: $desktop) {
+      @content;
+    }
+  } @else if $point==large {
+    /* 1680px Wide */
+    @media (min-width: $large) {
+      @content;
+    }
+  } @else {
+    @media (min-width: $point) {
+      /* Variable breakpoint */
+      @content;
+    }
+  }
+}
+
+@mixin bigger-than-ipad-pro {
+  @media (min-width: 1367px) {
+    // Styles for anything bigger than iPad Pro
+    @content;
+  }
+}
+
+@mixin ipad-pro {
+  @media (max-width: 1366px) {
+    // Styles for iPad Pro and smaller
+    @content;
+  }
+}

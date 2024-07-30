@@ -1,14 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { TextToSpeechService } from '../services/speech.service';
+import { TextToSpeechService } from '@services/speech.service';
 
 @Component({
   selector: 'app-speech-text',
   template: `
     <ng-container>
       <textarea name="text" [(ngModel)]="msg" (change)="textChanged$.next()"></textarea>
-      <button id="stop" #stop (click)="stopTextToSpeech()">Stop!</button>
-      <button id="speak" #speak (click)="playTextToSpeech()">Speak</button>
+      <div class="btn_container">
+        <button mat-flat-button color="primary" id="stop" #stop (click)="stopTextToSpeech()">Stop</button>
+        <button mat-flat-button color="primary" id="speak" #speak (click)="playTextToSpeech()">Speak</button>
+      </div>
     </ng-container>
   `,
   styleUrl: './speech-text.component.scss',

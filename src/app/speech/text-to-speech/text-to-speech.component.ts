@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-text-to-speech',
+  selector: 'text-to-speech',
   template: `
-    <div class="voiceinator">
-      <h1>TTS</h1>
+    <h5>TTS</h5>
+    <div class="container">
       <app-speech-voice></app-speech-voice>
       <app-speech-text></app-speech-text>
     </div>

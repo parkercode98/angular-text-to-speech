@@ -1,0 +1,76 @@
+@import "theme";
+@import "colors";
+@import "mixins";
+@import "buttons";
+@import "typography";
+@import "utilities";
+
+:root {
+  --discovery-background: #fff;
+  --discovery-background-90: #ffffffe6;
+  --discovery-background-80: #fffc;
+  --discovery-foreground: #000;
+  --discovery-foreground-90: #000000e6;
+  --discovery-foreground-80: #000c;
+  --discovery-cl-black: #424242;
+
+  color: var(--discovery-foreground);
+}
+
+.dark-theme {
+  --discovery-background: #000;
+  --discovery-background-90: #000c;
+  --discovery-background-80: #020101cc;
+  --discovery-foreground: #fffc;
+  --discovery-foreground-90: #fffc;
+  --discovery-foreground-80: #fffc;
+  --discovery-cl-black: #fffc;
+
+  color: var(--discovery-foreground);
+}
+
+/* Snackbar */
+.snackbar-success {
+  border-radius: $border-radius !important;
+  background: $success-green !important;
+
+  --mdc-snackbar-container-shape: $border-radius !important;
+  --mdc-snackbar-container-color: $success-green !important;
+}
+
+.snackbar-error {
+  border-radius: $border-radius !important;
+  background: $alert-red !important;
+
+  --mdc-snackbar-container-shape: $border-radius !important;
+  --mdc-snackbar-container-color: $alert-red !important;
+}
+
+/* JSON UI */
+pre {
+  padding: 0 16px;
+}
+
+.resource {
+  border-radius: $border-radius;
+}
+
+/* GENERIC PANEL */
+.panel {
+  background-color: $white-90;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  height: 100%;
+
+  .panel-header {
+    font-weight: $font-weight-semibold;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0 0 24px;
+    margin: 0;
+  }
+}
+
+.opaque {
+  background-color: $white !important;
+}

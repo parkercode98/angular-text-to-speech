@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TextToSpeechService } from './speech.service';
+import { EventMqttService } from './event.mqtt.service';
 
-describe('SpeechServiceService', () => {
-  let service: TextToSpeechService;
+describe('EventMqttService', () => {
+  let service: EventMqttService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TextToSpeechService);
+    service = TestBed.inject(EventMqttService);
   });
 
   it('should be created', () => {

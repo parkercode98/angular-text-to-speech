@@ -1,40 +1,28 @@
 :host {
-  display: block;
+  display: flex;
+  flex-flow: column;
 }
 
-button,
 textarea {
-  width: 100%;
   display: block;
   margin: 10px 0;
-  padding: 10px;
-  border: 0;
-  font-size: 2rem;
+  padding: 0.5rem;
+  border: 1px solid #4b4b4b69;
+  border-radius: 0.5rem;
   background: #f7f7f7;
   outline: 0;
+  height: 10rem;
 }
 
-textarea {
-  height: 20rem;
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
+
+  button.recording {
+    background-color: red;
+  }
 }
 
-button {
-  background: #ffc600;
-  border: 0;
-  width: 49%;
-  float: left;
-  font-family: 'Pacifico', cursive;
-  margin-bottom: 0;
-  font-size: 2rem;
-  border-bottom: 5px solid #f3c010;
-  cursor: pointer;
-  position: relative;
-}
-
-button:active {
-  top: 2px;
-}
-
-button:nth-of-type(1) {
-  margin-right: 2%;
-}

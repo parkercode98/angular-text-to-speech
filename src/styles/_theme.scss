@@ -1,0 +1,108 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+/*
+Light Theme
+*/
+$light-primary: mat.m2-define-palette(
+  (
+    50: #e5eff9,
+    100: #bfd6f1,
+    200: #94bbe8,
+    300: #699fdf,
+    400: #498bd8,
+    500: #2976d1,
+    600: #246ecc,
+    700: #1f63c6,
+    800: #1959c0,
+    900: #0f46b5,
+    A100: #e3ebff,
+    A200: #b0c7ff,
+    A400: #7da3ff,
+    A700: #6391ff,
+    contrast: (
+      50: #000,
+      100: #000,
+      200: #000,
+      300: #000,
+      400: #000,
+      500: #fff,
+      600: #fff,
+      700: #fff,
+      800: #fff,
+      900: #fff,
+      A100: #000,
+      A200: #000,
+      A400: #000,
+      A700: #000
+    )
+  )
+);
+$light-accent: mat.m2-define-palette(mat.$m2-gray-palette);
+$light-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $light-primary,
+      accent: $light-accent
+    )
+  )
+);
+
+/*
+Dark Theme
+*/
+$dark-primary: mat.m2-define-palette(
+  (
+    50: #e5eff9,
+    100: #bfd6f1,
+    200: #94bbe8,
+    300: #699fdf,
+    400: #498bd8,
+    500: #2976d1,
+    600: #246ecc,
+    700: #1f63c6,
+    800: #1959c0,
+    900: #0f46b5,
+    A100: #e3ebff,
+    A200: #b0c7ff,
+    A400: #7da3ff,
+    A700: #6391ff,
+    contrast: (
+      50: #000,
+      100: #000,
+      200: #000,
+      300: #000,
+      400: #000,
+      500: #fff,
+      600: #fff,
+      700: #fff,
+      800: #fff,
+      900: #fff,
+      A100: #000,
+      A200: #000,
+      A400: #000,
+      A700: #000
+    )
+  )
+);
+$dark-accent: mat.m2-define-palette(mat.$m2-gray-palette);
+$dark-theme: mat.m2-define-dark-theme(
+  (
+    color: (
+      primary: $dark-primary,
+      accent: $dark-accent
+    )
+  )
+);
+
+/* Light theme by default */
+@include mat.core-theme($light-theme);
+@include mat.all-component-themes($light-theme);
+
+/* Dark theme when inside dark-theme class */
+body.dark-theme,
+.dark-theme {
+  @include mat.core-color($dark-theme);
+  @include mat.all-component-colors($dark-theme);
+}

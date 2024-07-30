@@ -1,15 +1,15 @@
 :host {
-  display: block;
+  display: flex;
+  flex-flow: column;
+  
 }
 
 input,
 select {
-  width: 100%;
   display: block;
   margin: 10px 0;
   padding: 10px;
   border: 0;
-  font-size: 2rem;
   background: #f7f7f7;
   outline: 0;
 }

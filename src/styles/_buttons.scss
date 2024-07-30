@@ -1,0 +1,54 @@
+@import "colors";
+@import "utilities";
+
+/*
+Buttons
+*/
+
+.btn {
+  font-size: 16px;
+  line-height: 22px;
+  padding: 10px 20px;
+  min-width: 129px;
+  border-radius: $border-radius;
+  max-height: 40px;
+  border: transparent;
+  cursor: pointer;
+  transition: background-color 120ms ease-out;
+
+  &-accent {
+    background-color: $blue-accent;
+    color: $white;
+
+    &:hover:enabled {
+      background-color: $blue-accent-hover;
+    }
+  }
+
+  &-primary {
+    background-color: $blue-dark-primary;
+    color: $white;
+  }
+
+  &-secondary {
+    background-color: $gray-white;
+    color: $blue-accent;
+
+    &:hover:enabled {
+      background-color: $gray-white-hover;
+    }
+  }
+
+  &-tertiary {
+    background-color: $white;
+    color: $blue-accent;
+    border: 1px solid $blue-accent;
+    border-radius: $border-radius;
+  }
+
+  &-disabled {
+    background-color: $gray-medium-light;
+    color: $gray-dark;
+    cursor: default;
+  }
+}

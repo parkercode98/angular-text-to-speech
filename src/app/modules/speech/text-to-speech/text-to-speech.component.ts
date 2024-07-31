@@ -9,8 +9,8 @@ import { TextToSpeechService } from '@services/speech.service';
     <div class="container">
       <textarea name="text" [(ngModel)]="msg"></textarea>
       <div class="btn_container">
-        <button mat-flat-button color="primary" (click)="tts.audio.pause()">Stop</button>
-        <button mat-flat-button color="primary" (click)="tts.playTextToSpeech(this.msg)">Speak</button>
+        <button mat-flat-button color="primary" (click)="tts.pause()">Stop</button>
+        <button mat-flat-button color="primary" (click)="tts.speak(this.msg)">Speak</button>
       </div>
     </div>
   `,

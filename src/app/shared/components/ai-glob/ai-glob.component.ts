@@ -37,7 +37,7 @@ import { Component } from '@angular/core';
   selector: 'ai-glob',
   template: `
     <div class="blobs">
-      <svg viewbox="0 0 1200 1200">
+      <svg viewbox="0 0 1200 1200" width="100%" height="100%">
         <g class="blob blob-1">
           <path />
         </g>

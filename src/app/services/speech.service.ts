@@ -40,23 +40,17 @@ export class TextToSpeechService {
     this.audio = new Audio();
   }
 
-  public audio: HTMLAudioElement;
+  private audio: HTMLAudioElement;
 
   /* ----------------- */
-  public updateSpeech(property: TTSProperties) {
-    const { name, value } = property;
-    /* ----------------- */
-    localStorage.setItem(name, value);
-  }
-
-  public playTextToSpeech(text: string, voiceOptions?: GoogleVoiceServiceVoiceConfig) {
-    const speakingRate = +(localStorage.getItem('rate') || '1');
-    const pitch = +(localStorage.getItem('pitch') || '1');
-
-    this.getAudio(text, {
-      audioConfig: { pitch, speakingRate },
-      ...(!!voiceOptions ? { voice: voiceOptions } : {}),
-    });
+  public speak(text: string, options?: GoogleVoiceServiceOptions) {
+    this.getAudio(text, options)
+      .then((response) => {
+        this.playAudio(response.audioContent);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   }
 
   private getAudio(text: string, options?: GoogleVoiceServiceOptions) {
@@ -92,23 +86,18 @@ export class TextToSpeechService {
       },
     } as const;
 
-    this.http.post(ttsURL, request, { headers }).subscribe({
-      next: (response: any) => {
-        console.log('GCP TTS response:', response);
-        this.playAudio(response.audioContent);
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      },
-    });
+    return lastValueFrom(
+      this.http.post<{ audioContent: string; [key: string]: any }>(ttsURL, request, { headers })
+    );
   }
 
   public playAudio(data: string) {
     this.audio.src = `data:audio/mp3;base64,${data}`;
-    // console.log('Started playing: ' + Date.now());
-    this.audio.play().finally(() => {
-      // console.log('Ended playing: ' + Date.now());
-    });
+    this.audio.play();
+  }
+
+  public pause() {
+    this.audio.pause();
   }
 }
 /* -------------------------------------------------------------------------- */

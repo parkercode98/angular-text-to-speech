@@ -18,7 +18,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "lib": ["ES2023", "dom"],
+    "lib": ["ES2022", "dom"],
     "baseUrl": "./",
     "paths": {
       "@shared/*": ["src/app/shared/*"],
@@ -34,7 +34,9 @@
       "@services/*": ["src/app/services/*"],
       "@services": ["src/app/services"],
       "@modules/*": ["src/app/modules/*"],
-      "@modules": ["src/app/modules"]
+      "@modules": ["src/app/modules"],
+      "@pages/*": ["src/app/pages/*"],
+      "@pages": ["src/app/pages"],
     }
   },
   "angularCompilerOptions": {

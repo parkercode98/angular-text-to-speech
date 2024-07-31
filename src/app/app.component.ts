@@ -8,17 +8,9 @@ import { AppModule } from './app.module';
   imports: [AppModule],
   template: `
     <div class="main-wrapper">
-      <text-to-speech />
-      <speech-to-text />
-      <event-stream />
-      <!-- <div class="glob-container">
-        <ai-glob />
-      </div> -->
-      <!-- <mic-button></mic-button> -->
+      <router-outlet></router-outlet>
     </div>
   `,
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-  title = 'tts_stt';
-}
+export class AppComponent {}

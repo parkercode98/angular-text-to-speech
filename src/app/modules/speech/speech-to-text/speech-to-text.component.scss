@@ -1,4 +1,4 @@
-@use 'src/styles/_colors.scss' as *;
+@use 'colors' as *;
 
 :host {
   position: relative;
@@ -8,33 +8,6 @@
   border-radius: 1rem;
   width: clamp(300px, 80vw, 500px);
   mask-image: radial-gradient(white, black);
-}
-
-.container {
-  display: flex;
-  flex-flow: column;
-  padding: 1rem;
-  width: 100%;
-  z-index: 1;
-  
-  span {
-    font-size: smaller;
-  }
-}
-
-.btn_container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 4px;
-  gap: 1rem;
-
-  button.recording {
-    background-color: $red;
-    mat-icon {
-      color: white;
-    }
-  }
 }
 
 textarea {
@@ -54,4 +27,31 @@ h5 {
   background: $blue-accent;
   text-align: center;
   color: white;
+}
+
+.container {
+  display: flex;
+  flex-flow: column;
+  padding: 1rem;
+  width: 100%;
+  z-index: 1;
+
+  span {
+    font-size: smaller;
+  }
+}
+
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
+
+  button.recording {
+    background-color: $red;
+    mat-icon {
+      color: white;
+    }
+  }
 }

@@ -1,4 +1,4 @@
-@use 'src/styles/_colors.scss' as *;
+@use 'colors' as *;
 
 :host {
   position: relative;
@@ -22,6 +22,13 @@ textarea {
   resize: none;
 }
 
+h5 {
+  padding: 0.5rem;
+  background: $blue-accent;
+  text-align: center;
+  color: white;
+}
+
 .container {
   display: flex;
   flex-flow: column;
@@ -30,9 +37,10 @@ textarea {
   z-index: 1;
 }
 
-h5 {
-  padding: 0.5rem;
-  background: $blue-accent;
-  text-align: center;
-  color: white;
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
 }

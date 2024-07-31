@@ -28,10 +28,6 @@ export type GoogleVoiceServiceOptions = {
 /* ----------------- */
 export type TTSPropertyName = keyof Pick<SpeechSynthesisUtterance, 'rate' | 'pitch'>;
 export type TTSProperties = { name: TTSPropertyName; value: string };
-
-type RecordOptions = {
-  autoStopDetection?: boolean;
-};
 /* ------------------------------------------------------------------------- */
 
 // -------------------------------------------------------------------------- //
@@ -127,7 +123,7 @@ export class SpeechToTextService {
   public status$ = new BehaviorSubject<'idle' | 'recording' | 'pending'>('idle');
 
   public hasAudioPermissions: boolean = false;
-  public audioInputDeviceName: string = '';
+  public audioInputDeviceName: string = 'Unknown';
   /* ----------------- */
   private mediaRecorder: MediaRecorder = new MediaRecorder(new MediaStream());
   private chunks: Blob[] = [];
@@ -142,23 +138,31 @@ export class SpeechToTextService {
     this.resetVariables();
     this.resetObservables();
     /* ----------------- */
-    navigator.permissions.query({ name: 'microphone' as PermissionName }).then((result) => {
-      this.hasAudioPermissions = result.state === 'granted';
-      result.onchange = () => {
+    const boundInit = this.init.bind(this);
+    navigator.mediaDevices.removeEventListener('devicechange', boundInit);
+    navigator.mediaDevices.addEventListener('devicechange', boundInit, { once: true });
+    /* ----------------- */
+    navigator.permissions
+      .query({ name: 'microphone' as PermissionName })
+      .then((result) => {
         this.hasAudioPermissions = result.state === 'granted';
-      };
+        result.removeEventListener('change', boundInit);
+        result.addEventListener('change', boundInit);
+      })
+      .catch(() => {});
+    //
+
+    this.askAudioPermissions().then((granted) => {
+      this.hasAudioPermissions = granted;
+
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const defaultAudioInputDevice =
+          devices.find((device) => device.kind === 'audioinput' && device.deviceId === 'default') ??
+          devices[0];
+        //
+        this.audioInputDeviceName = defaultAudioInputDevice?.label || 'Unknown';
+      });
     });
-
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const defaultAudioInputDevice = devices.find(
-        (device) => device.kind === 'audioinput' && device.deviceId === 'default'
-      );
-      this.audioInputDeviceName = defaultAudioInputDevice?.label || 'Unknown';
-    });
-
-    navigator.mediaDevices.addEventListener('devicechange', this.init.bind(this), { once: true });
-
-    this.askAudioPermissions();
   }
 
   private resetObservables() {
@@ -212,9 +216,12 @@ export class SpeechToTextService {
         });
 
         this.setMediaListeners();
+
+        return true;
       })
       .catch((err) => {
         console.error(`The following getUserMedia error occurred: ${err}`);
+        return false;
       });
   }
 

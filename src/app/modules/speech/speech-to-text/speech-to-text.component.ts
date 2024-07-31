@@ -36,8 +36,6 @@ import { SpeechToTextService } from '@services/speech.service';
   styleUrl: './speech-to-text.component.scss',
 })
 export class SpeechToTextComponent {
-  text: string = '';
-
   constructor(public stt: SpeechToTextService, private cdr: ChangeDetectorRef) {}
   /* ------------------------------------------------------------------------ */
 

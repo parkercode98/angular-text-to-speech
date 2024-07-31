@@ -11,7 +11,9 @@ import { AppModule } from './app.module';
       <text-to-speech />
       <speech-to-text />
       <event-stream />
-      <!-- <ai-glob></ai-glob> -->
+      <!-- <div class="glob-container">
+        <ai-glob />
+      </div> -->
       <!-- <mic-button></mic-button> -->
     </div>
   `,

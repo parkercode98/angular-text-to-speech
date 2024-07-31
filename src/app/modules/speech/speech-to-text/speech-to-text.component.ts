@@ -1,34 +1,34 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { SpeechToTextService } from '@services/speech.service';
-import { Subscription } from 'rxjs';
+/* -------------------------------------------------------------------------- */
 
 @Component({
   selector: 'speech-to-text',
   template: `
     <h5>STT</h5>
     <div class="container">
-      <span>Audio Input: {{ stt.audioInputDeviceName }}</span>
-      <textarea name="text" [(ngModel)]="text" readonly></textarea>
+      <span
+        ><strong>{{ 'Audio Input: ' }}</strong
+        >{{ stt.audioInputDeviceName }}</span
+      >
+      <span
+        ><strong>{{ 'Status: ' }}</strong
+        >{{ stt.status$ | async }}</span
+      >
+      <textarea name="text" [value]="stt.text$ | async" readonly></textarea>
       <div
         class="btn_container"
         [matTooltip]="stt.hasAudioPermissions ? '' : 'Audio permissions not granted.'"
       >
-        <!-- <button
+        <button
           mat-flat-button
           color="primary"
-          (pointerdown)="startRecording()"
-          (pointerup)="stopRecording()"
+          [ngClass]="(stt.isRecording$ | async) ? 'recording' : ''"
+          (pointerdown)="handleRecordBtnDown()"
           [disabled]="!stt.hasAudioPermissions"
         >
-          {{ stt.isRecording ? 'Recording' : 'Hold to Record' }}
-        </button> -->
-        <button
-          mat-mini-fab
-          color="accent"
-          [ngClass]="(stt.isRecording$ | async) ? 'recording' : ''"
-          (click)="toggleRecord()"
-        >
           <mat-icon>mic</mat-icon>
+          {{ (stt.isRecording$ | async) ? 'Recording' : 'Hold to Record' }}
         </button>
       </div>
     </div>
@@ -37,35 +37,18 @@ import { Subscription } from 'rxjs';
 })
 export class SpeechToTextComponent {
   text: string = '';
-  subscription = new Subscription();
 
   constructor(public stt: SpeechToTextService, private cdr: ChangeDetectorRef) {}
   /* ------------------------------------------------------------------------ */
 
-  ngOnInit() {
-    this.subscription.add(
-      this.stt.text$.subscribe((value) => {
-        this.text = value;
-        this.cdr.detectChanges();
-      })
-    );
-  }
+  ngOnInit() {}
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+  ngOnDestroy() {}
 
   /* ------------------------------------------------------------------------ */
 
-  toggleRecord() {
-    this.stt.toggleRecord();
-  }
-
-  startRecording() {
+  handleRecordBtnDown() {
     this.stt.startRecording();
-  }
-
-  stopRecording() {
-    this.stt.stopRecording();
+    window.addEventListener('pointerup', this.stt.stopRecording.bind(this.stt), { once: true });
   }
 }

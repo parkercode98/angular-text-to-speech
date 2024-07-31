@@ -1,4 +1,4 @@
-@use 'src/styles/_colors.scss' as *;
+@use 'colors' as *;
 
 :host {
   position: relative;
@@ -6,15 +6,37 @@
   flex-flow: column;
   background: white;
   border-radius: 1rem;
-  overflow: hidden;
+  width: clamp(300px, 80vw, 500px);
+  mask-image: radial-gradient(white, black);
+  z-index: 1;
 }
 
 .container {
   display: flex;
   flex-flow: column;
-  padding: 2rem;
-  width: clamp(300px, 80vw, 500px);
+  padding: 1rem;
+  width: 100%;
   z-index: 1;
+}
+
+.btn_container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px;
+  gap: 1rem;
+}
+
+textarea {
+  display: block;
+  margin: 10px 0;
+  padding: 0.5rem;
+  border: 1px solid #4b4b4b69;
+  border-radius: 0.5rem;
+  background: #f7f7f7;
+  outline: 0;
+  height: 10rem;
+  resize: none;
 }
 
 h5 {

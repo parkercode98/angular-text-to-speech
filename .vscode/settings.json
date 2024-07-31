@@ -1,5 +1,7 @@
 {
   "files.exclude": {
     "**/*.spec.ts": true
-  }
+  },
+  "angular2-switcher.openSideBySide": true,
+  "reuseView": true,
 }

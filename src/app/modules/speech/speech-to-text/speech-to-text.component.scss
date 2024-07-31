@@ -6,34 +6,20 @@
   flex-flow: column;
   background: white;
   border-radius: 1rem;
-  overflow: hidden;
-}
-
-textarea {
-  display: block;
-  margin: 10px 0;
-  padding: 0.5rem;
-  border: 1px solid #4b4b4b69;
-  border-radius: 0.5rem;
-  background: #f7f7f7;
-  outline: 0;
-  height: 10rem;
-  resize: none;
+  width: clamp(300px, 80vw, 500px);
+  mask-image: radial-gradient(white, black);
 }
 
 .container {
   display: flex;
   flex-flow: column;
-  padding: 2rem;
-  width: clamp(300px, 80vw, 500px);
+  padding: 1rem;
+  width: 100%;
   z-index: 1;
-}
-
-h5 {
-  padding: 0.5rem;
-  background: $blue-accent;
-  text-align: center;
-  color: white;
+  
+  span {
+    font-size: smaller;
+  }
 }
 
 .btn_container {
@@ -49,4 +35,23 @@ h5 {
       color: white;
     }
   }
+}
+
+textarea {
+  display: block;
+  margin: 10px 0;
+  padding: 0.5rem;
+  border: 1px solid #4b4b4b69;
+  border-radius: 0.5rem;
+  background: #f7f7f7;
+  outline: 0;
+  height: 10rem;
+  resize: none;
+}
+
+h5 {
+  padding: 0.5rem;
+  background: $blue-accent;
+  text-align: center;
+  color: white;
 }

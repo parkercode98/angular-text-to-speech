@@ -6,7 +6,8 @@
   flex-flow: column;
   background: white;
   border-radius: 1rem;
-  overflow: hidden;
+  width: clamp(300px, 80vw, 500px);
+  mask-image: radial-gradient(white, black);
 }
 
 textarea {
@@ -24,8 +25,8 @@ textarea {
 .container {
   display: flex;
   flex-flow: column;
-  padding: 2rem;
-  width: clamp(300px, 80vw, 500px);
+  padding: 1rem;
+  width: 100%;
   z-index: 1;
 }
 

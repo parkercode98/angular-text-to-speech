@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
 import { environment } from '@env/environment.secret';
 // --------------------------------- Types --------------------------------- //
 export type GoogleVoiceServiceAudioConfig = {
@@ -122,8 +122,9 @@ export class TextToSpeechService {
 // -------------------------------------------------------------------------- //
 @Injectable({ providedIn: 'root' })
 export class SpeechToTextService {
-  public text$ = new Subject<string>();
-  public isRecording$ = new Subject<boolean>();
+  public text$ = new BehaviorSubject('');
+  public isRecording$ = new BehaviorSubject(false);
+  public status$ = new BehaviorSubject<'idle' | 'recording' | 'pending'>('idle');
 
   public hasAudioPermissions: boolean = false;
   public audioInputDeviceName: string = '';
@@ -131,22 +132,16 @@ export class SpeechToTextService {
   private mediaRecorder: MediaRecorder = new MediaRecorder(new MediaStream());
   private chunks: Blob[] = [];
   private subscription = new Subscription();
-  private loudness = {
-    current: 1,
-    hasSpoken: false,
-    _timeoutId: undefined as NodeJS.Timeout | number | undefined,
-    shouldStop: false,
-    inProgress: false,
-  };
-  private recordOptions: RecordOptions = {
-    autoStopDetection: false,
-  };
 
   constructor(private http: HttpClient) {
     this.init();
   }
+  /* ----------------- */
 
   private init() {
+    this.resetVariables();
+    this.resetObservables();
+    /* ----------------- */
     navigator.permissions.query({ name: 'microphone' as PermissionName }).then((result) => {
       this.hasAudioPermissions = result.state === 'granted';
       result.onchange = () => {
@@ -162,74 +157,65 @@ export class SpeechToTextService {
     });
 
     navigator.mediaDevices.addEventListener('devicechange', this.init.bind(this), { once: true });
+
+    this.askAudioPermissions();
+  }
+
+  private resetObservables() {
+    this.isRecording$.next(false);
+    this.status$.next('idle');
   }
 
   private resetVariables() {
-    this.isRecording$.next(false);
     this.chunks = [];
-    this.loudness = {
-      current: 1,
-      hasSpoken: false,
-      _timeoutId: undefined,
-      shouldStop: false,
-      inProgress: false,
-    };
-    this.recordOptions.autoStopDetection = false;
     this.subscription.unsubscribe();
     this.subscription = new Subscription();
   }
 
   private setMediaListeners() {
     this.mediaRecorder.ondataavailable = (event) => {
-      console.log('Pushed Chunks');
       this.chunks.push(event.data);
     };
 
     this.mediaRecorder.onstop = () => {
-      const chunks = this.chunks;
-      this.resetVariables();
       console.log('Recording stopped');
-      const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
-      this.encodeBlob(blob).then((encodedAudio) => this.getTextFromEncodedAudio(encodedAudio));
+      this.isRecording$.next(false);
+      this.status$.next('pending');
+      const blob = new Blob(this.chunks, { type: 'audio/webm;codecs=opus' });
+      this.encodeBlob(blob)
+        .then((encodedAudio) => {
+          return this.getTextFromEncodedAudio(encodedAudio).then((text) => {
+            if (!!text) this.text$.next(text);
+          });
+        })
+        .finally(() => {
+          this.resetVariables();
+          this.resetObservables();
+        });
     };
 
     this.mediaRecorder.onstart = () => {
-      this.isRecording$.next(true);
       console.log('Recording started');
-      const lousnessLevel$ = watchLoudnessLevel(this.mediaRecorder.stream);
-
-      if (!!this.recordOptions.autoStopDetection) {
-        const checkEnd = (fromTO = false) => {
-          if (fromTO) this.loudness.inProgress = false;
-
-          if (this.loudness.current < 2) {
-            if (this.loudness.hasSpoken) {
-              if (fromTO) {
-                if (this.loudness.shouldStop) this.stopRecording();
-              } else {
-                this.loudness.shouldStop = true;
-                if (!this.loudness.inProgress) {
-                  this.loudness.inProgress = true;
-                  this.loudness._timeoutId = setTimeout(checkEnd, 2000, true);
-                }
-              }
-            }
-          } else {
-            this.loudness.hasSpoken = true;
-            this.loudness.shouldStop = false;
-            clearTimeout(this.loudness._timeoutId);
-          }
-        };
-
-        this.subscription.add(
-          lousnessLevel$.subscribe((level) => {
-            this.loudness.current = level;
-            console.log('Level:', level);
-            checkEnd();
-          })
-        );
-      }
+      this.isRecording$.next(true);
+      this.status$.next('recording');
+      // const lousnessLevel$ = watchLoudnessLevel(this.mediaRecorder.stream);
     };
+  }
+
+  private askAudioPermissions() {
+    return navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        this.mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus',
+          audioBitsPerSecond: 128000,
+        });
+
+        this.setMediaListeners();
+      })
+      .catch((err) => {
+        console.error(`The following getUserMedia error occurred: ${err}`);
+      });
   }
 
   private encodeBlob(blob: Blob) {
@@ -252,10 +238,6 @@ export class SpeechToTextService {
   }
 
   private getTextFromEncodedAudio(encodedAudio: string | ArrayBuffer | null) {
-    // const audio = new Audio();
-    // audio.src = `data:audio/webm;base64,${encodedAudio}`;
-    // audio.play();
-    /* ----------------- */
     const GCP_API_KEY = environment.GCP_API_KEY;
 
     if (!GCP_API_KEY) throw new Error('API_KEY is not defined');
@@ -275,74 +257,48 @@ export class SpeechToTextService {
       },
     } as const;
 
-    this.http.post(sttURL, request, { headers }).subscribe({
-      next: (response: any) => {
-        console.group('GCP STT Response');
-        console.log(response);
-        console.groupEnd();
-
+    return lastValueFrom<Record<string, any>>(this.http.post(sttURL, request, { headers }))
+      .then((response) => {
+        // console.group('GCP STT Response');
+        // console.log(response);
+        // console.groupEnd();
         const transcription = ((response.results ?? []) as any[])
           .map((result) => result?.alternatives?.[0]?.transcript || '')
           .join('\n');
-
-        this.text$.next(transcription);
-      },
-      error: (error) => {
+        //
+        return transcription;
+      })
+      .catch((error) => {
         console.error('Error:', error);
-      },
-    });
-
-    // const sttURL = `http://localhost:8080/api/ggl-stt`;
-
-    // this.http.post(sttURL, request).subscribe({
-    //   next: (response: any) => {
-    //     console.log('GCP STT response:', response);
-    //     this.text$.next(response.transcription);
-    //   },
-    //   error: (error) => {
-    //     console.error('Error:', error);
-    //   },
-    // });
+        return null;
+      });
   }
 
   /* ----------------- */
 
-  public startRecording(options?: RecordOptions) {
+  public startRecording() {
     if (!this.hasAudioPermissions || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
       console.error('Permissions not granted!');
       alert('Audio permissions not granted');
       return;
     }
 
-    this.recordOptions = { ...this.recordOptions, ...options };
+    if (this.mediaRecorder.state === 'recording' || this.status$.value !== 'idle') return;
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm;codecs=opus',
-          audioBitsPerSecond: 128000,
-        });
-
-        this.setMediaListeners();
-
-        /* ----------------- */
-        this.mediaRecorder.start();
-      })
-      .catch((err) => {
-        console.error(`The following getUserMedia error occurred: ${err}`);
-      });
+    this.mediaRecorder.start();
   }
 
   public stopRecording() {
+    if (this.mediaRecorder.state === 'inactive') return;
+
     this.mediaRecorder.stop();
   }
 
-  public toggleRecord(options?: RecordOptions) {
+  public toggleRecord() {
     if (this.mediaRecorder.state === 'recording') {
       this.stopRecording();
     } else {
-      this.startRecording(options);
+      this.startRecording();
     }
   }
 }

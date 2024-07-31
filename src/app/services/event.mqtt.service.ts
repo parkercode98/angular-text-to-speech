@@ -20,6 +20,7 @@ export class EventMqttService {
 
     this._mqttService.onError.subscribe((error) => {
       this.log$.next(`Error: ${JSON.stringify(error)}`);
+      this._mqttService.disconnect();
     });
 
     this._mqttService.onClose.subscribe(() => {

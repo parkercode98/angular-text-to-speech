@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, fromEvent, lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
 import { environment } from '@env/environment.secret';
+import { PromiseResolvers } from '../utils';
 
 // --------------------------------- Types --------------------------------- //
 export type GoogleVoiceServiceAudioConfig = {
@@ -34,11 +35,14 @@ export type TTSProperties = { name: TTSPropertyName; value: string };
 // -------------------------------------------------------------------------- //
 //-                              TEXT TO SPEECH                              -//
 // -------------------------------------------------------------------------- //
+/**
+ * Text to Speech Service
+ */
 @Injectable({ providedIn: 'root' })
 export class TextToSpeechService {
   private audio = new Audio();
   private stream: MediaStream;
-  isPlaying$ = new BehaviorSubject(false);
+  isSpeaking$ = new BehaviorSubject(false);
 
   /* ----------------- */
   constructor(private http: HttpClient) {
@@ -46,15 +50,15 @@ export class TextToSpeechService {
     this.stream = this.audio.captureStream();
 
     this.audio.addEventListener('play', () => {
-      this.isPlaying$.next(true);
+      this.isSpeaking$.next(true);
     });
 
     this.audio.addEventListener('ended', () => {
-      this.isPlaying$.next(false);
+      this.isSpeaking$.next(false);
     });
 
     this.audio.addEventListener('pause', () => {
-      this.isPlaying$.next(false);
+      this.isSpeaking$.next(false);
     });
   }
 
@@ -62,7 +66,7 @@ export class TextToSpeechService {
   public speak(text: string, options?: GoogleVoiceServiceOptions) {
     this.getAudio(text, options).then(({ success, payload }) => {
       if (success) {
-        this.playAudio(payload.audioContent);
+        this.play(payload.audioContent);
       }
     });
   }
@@ -118,7 +122,7 @@ export class TextToSpeechService {
       });
   }
 
-  public playAudio(data: string) {
+  private play(data: string) {
     this.audio.src = `data:audio/mp3;base64,${data}`;
     this.audio.play();
   }
@@ -145,6 +149,8 @@ export class SpeechToTextService {
   private mediaRecorder: MediaRecorder = new MediaRecorder(new MediaStream());
   private chunks: Blob[] = [];
   private subscription = new Subscription();
+  private recordingPromise = PromiseResolvers<string>();
+  private recordTime = 0;
 
   constructor(private http: HttpClient) {
     this.init();
@@ -191,6 +197,8 @@ export class SpeechToTextService {
     this.chunks = [];
     this.subscription.unsubscribe();
     this.subscription = new Subscription();
+    this.recordingPromise = PromiseResolvers<string>();
+    this.recordTime = 0;
   }
 
   private setMediaListeners() {
@@ -200,13 +208,23 @@ export class SpeechToTextService {
 
     this.mediaRecorder.onstop = () => {
       console.log('Recording stopped');
+      this.recordTime = Date.now() - this.recordTime;
       this.isRecording$.next(false);
       this.status$.next('pending');
+      if (this.recordTime < 1000) {
+        console.log('Recording too short');
+        this.resetVariables();
+        this.resetObservables();
+        return;
+      }
       const blob = new Blob(this.chunks, { type: 'audio/webm;codecs=opus' });
       this.encodeBlob(blob)
         .then((encodedAudio) => {
           return this.getTextFromEncodedAudio(encodedAudio).then((text) => {
-            if (!!text) this.text$.next(text);
+            if (!!text) {
+              this.text$.next(text);
+              this.recordingPromise.resolve(text);
+            }
           });
         })
         .finally(() => {
@@ -217,6 +235,7 @@ export class SpeechToTextService {
 
     this.mediaRecorder.onstart = () => {
       console.log('Recording started');
+      this.recordTime = Date.now();
       this.isRecording$.next(true);
       this.status$.next('recording');
       // const lousnessLevel$ = watchLoudnessLevel(this.mediaRecorder.stream);
@@ -300,16 +319,20 @@ export class SpeechToTextService {
 
   /* ----------------- */
 
-  public startRecording() {
+  public startRecording(): Promise<string | null> {
     if (!this.hasAudioPermissions || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
       console.error('Permissions not granted!');
       alert('Audio permissions not granted');
-      return;
+      return Promise.resolve(null);
     }
 
-    if (this.mediaRecorder.state === 'recording' || this.status$.value !== 'idle') return;
+    if (this.mediaRecorder.state === 'recording' || this.status$.value !== 'idle') {
+      return Promise.resolve(null);
+    }
 
     this.mediaRecorder.start();
+
+    return this.recordingPromise.promise;
   }
 
   public stopRecording() {

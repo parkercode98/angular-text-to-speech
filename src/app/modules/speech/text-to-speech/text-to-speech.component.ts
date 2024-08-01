@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
     <div class="container">
       <span
         ><strong>{{ 'Playing: ' }}</strong
-        >{{ tts.isPlaying$ | async }}</span
+        >{{ tts.isSpeaking$ | async }}</span
       >
       <textarea name="text" [(ngModel)]="msg"></textarea>
       <div class="btn_container">

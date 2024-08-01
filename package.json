@@ -63,5 +63,10 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "tsup": "^8.2.0",
     "typescript": "~5.5.2"
+  },
+  "overrides": {
+    "ngx-typed2": {
+      "@angular/common": "$@angular/common"
+    }
   }
 }

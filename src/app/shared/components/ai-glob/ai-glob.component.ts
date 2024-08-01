@@ -1,7 +1,13 @@
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, Input } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, map, Subject, Subscription } from 'rxjs';
 /* -------------------------------------------------------------------------- */
+
+// --------------------------------- Types --------------------------------- //
+export namespace AiGlob {
+  export type State = 'idle' | 'speaking' | 'listening';
+}
+/* ------------------------------------------------------------------------- */
 
 @Component({
   selector: 'ai-glob',
@@ -39,42 +45,110 @@ import { toSignal } from '@angular/core/rxjs-interop';
   host: {
     '[style.--size]': 'getSize()',
     '[style.--scale]': 'getScale()',
+    '[attr.data-state]': 'getState()',
+    '[style.width.px]': 'size',
   },
 })
 export class AiGlobComponent {
   private size$ = new BehaviorSubject(0);
   private scale$ = new BehaviorSubject(1);
+  private state$ = new BehaviorSubject<AiGlob.State>('idle');
   private resizeObserver: ResizeObserver | null = null;
+  private subscriptions = new Subscription();
+  private intervals = {} as { [key: string | 'scale']: NodeJS.Timeout | undefined };
   /* ----------------- */
 
-  getSize = toSignal(this.size$.pipe(map((size) => `${size}px`)));
-  getScale = toSignal(this.scale$.pipe(map((scale) => scale.toFixed(2))));
-  /* ----------------- */
-
-  @HostBinding('style.width.px')
+  /**
+   * Size of the glob in px.
+   */
   @Input()
   size: number;
 
+  /**
+   * Changes the scale of the glob.
+   */
   @Input()
   set scale(scale: number) {
     this.scale$.next(scale);
   }
 
+  /**
+   * State of the glob: 'idle' | 'speaking' | 'listening'.
+   *
+   * @default 'idle'
+   */
+  @Input()
+  set state(state: AiGlob.State) {
+    this.state$.next(state);
+  }
+
+  /* ----------------- */
   constructor(private el: ElementRef, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.handleResize(this.el.nativeElement.getBoundingClientRect());
-    this.resizeObserver = new ResizeObserver((entries) => this.handleResize(entries[0].contentRect));
-    this.resizeObserver.observe(this.el.nativeElement);
+    this.trackSize();
+    this.trackState();
   }
 
   ngOnDestroy() {
-    if (this.resizeObserver) this.resizeObserver.disconnect();
+    this.subscriptions.unsubscribe();
   }
+
   /* ----------------- */
+  getSize = toSignal(this.size$.pipe(map((size) => `${size}px`)));
+
+  getScale = toSignal(this.scale$.pipe(map((scale) => scale.toFixed(2))));
+
+  getState = toSignal(this.state$);
+  /* ----------------- */
+
+  private trackSize() {
+    this.handleResize(this.el.nativeElement.getBoundingClientRect());
+    this.resizeObserver = new ResizeObserver((entries) => this.handleResize(entries[0].contentRect));
+    this.resizeObserver.observe(this.el.nativeElement);
+    this.subscriptions.add(this.resizeObserver.disconnect.bind(this.resizeObserver));
+  }
+
+  private trackState() {
+    this.subscriptions.add(
+      this.state$.subscribe((value) => {
+        switch (value) {
+          case 'speaking': {
+            this.animateScale();
+            break;
+          }
+          case 'listening': {
+            break;
+          }
+          case 'idle': {
+            this.animateScale(false);
+            break;
+          }
+        }
+      })
+    );
+    this.subscriptions.add(() => {
+      this.animateScale(false);
+    });
+  }
+
   private handleResize<T extends ResizeObserverEntry['contentRect']>(contentRect: T) {
-    const width = contentRect.width;
-    const height = contentRect.height;
-    this.size$.next(Math.min(width, height));
+    this.size$.next(Math.min(contentRect.width, contentRect.height));
+  }
+
+  // ------------- Animation ------------- //
+  private animateScale(animate = true) {
+    if (!animate) {
+      this.intervals.scale && clearInterval(this.intervals.scale);
+      this.scale$.next(1);
+      return;
+    }
+
+    this.intervals.scale = setInterval(() => {
+      const dec = Math.random() * (1.2 - 0.8) + 0.8;
+      this.scale$.next(dec);
+    }, 150);
   }
 }
+
+/* -------------------------------------------------------------------------- */

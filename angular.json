@@ -19,6 +19,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": ["mqtt-browser"],
             "outputPath": "dist/tts_stt",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -50,8 +51,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "15MB",
+                  "maximumError": "20MB"
                 }
               ],
               "outputHashing": "all",

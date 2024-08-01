@@ -9,7 +9,7 @@ import { SharedModule } from '@shared/shared.module';
   template: `
     <text-to-speech />
     <speech-to-text />
-    <event-stream />
+    <!-- <event-stream /> -->
   `,
   styleUrl: './test.component.scss',
 })

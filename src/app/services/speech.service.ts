@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, fromEvent, lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
 import { environment } from '@env/environment.secret';
+
 // --------------------------------- Types --------------------------------- //
 export type GoogleVoiceServiceAudioConfig = {
   /**
@@ -35,22 +36,35 @@ export type TTSProperties = { name: TTSPropertyName; value: string };
 // -------------------------------------------------------------------------- //
 @Injectable({ providedIn: 'root' })
 export class TextToSpeechService {
+  private audio = new Audio();
+  private stream: MediaStream;
+  isPlaying$ = new BehaviorSubject(false);
+
   /* ----------------- */
   constructor(private http: HttpClient) {
     this.audio = new Audio();
-  }
+    this.stream = this.audio.captureStream();
 
-  private audio: HTMLAudioElement;
+    this.audio.addEventListener('play', () => {
+      this.isPlaying$.next(true);
+    });
+
+    this.audio.addEventListener('ended', () => {
+      this.isPlaying$.next(false);
+    });
+
+    this.audio.addEventListener('pause', () => {
+      this.isPlaying$.next(false);
+    });
+  }
 
   /* ----------------- */
   public speak(text: string, options?: GoogleVoiceServiceOptions) {
-    this.getAudio(text, options)
-      .then((response) => {
-        this.playAudio(response.audioContent);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+    this.getAudio(text, options).then(({ success, payload }) => {
+      if (success) {
+        this.playAudio(payload.audioContent);
+      }
+    });
   }
 
   private getAudio(text: string, options?: GoogleVoiceServiceOptions) {
@@ -88,7 +102,20 @@ export class TextToSpeechService {
 
     return lastValueFrom(
       this.http.post<{ audioContent: string; [key: string]: any }>(ttsURL, request, { headers })
-    );
+    )
+      .then((response) => {
+        return {
+          success: true,
+          payload: response,
+        } as const;
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        return {
+          success: false,
+          payload: null,
+        } as const;
+      });
   }
 
   public playAudio(data: string) {
@@ -100,6 +127,7 @@ export class TextToSpeechService {
     this.audio.pause();
   }
 }
+
 /* -------------------------------------------------------------------------- */
 
 // -------------------------------------------------------------------------- //
@@ -301,17 +329,20 @@ export class SpeechToTextService {
 /* -------------------------------------------------------------------------- */
 
 function watchLoudnessLevel(stream: MediaStream) {
+  /* ----------------- */
   return new Observable<number>((subscriber) => {
+    subscriber.next(0);
+
+    console.log('STREAM ACTIVE');
     const audioCtx = new AudioContext();
     const analyser = audioCtx.createAnalyser();
     const source = audioCtx.createMediaStreamSource(stream);
+    let frameId: number;
     source.connect(analyser);
     analyser.fftSize = 256;
 
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-
-    let frameId: number;
 
     const watcher = () => {
       requestAnimationFrame(watcher);

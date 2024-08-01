@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 /* -------------------------------------------------------------------------- */
 export interface Publish {
   topic: string;

@@ -29,6 +29,13 @@ $shape-6: 'M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z';
   transform: scale(var(--scale));
   /* ----------------- */
 
+  &:active {
+    transform: scale(0.8);
+    --blob-1: red;
+    --blob-2: rgb(255, 199, 199);
+    --blob-3: salmon;
+    --bg-0: #dda6a69f;
+  }
   &::after {
     position: absolute;
     content: '';
